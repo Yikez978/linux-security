@@ -56,7 +56,7 @@ TrapProcess(){
 
 
 ## check csv file exist
-CSVNAME=${0%.}.csv
+CSVNAME=${0/.*//}.csv
 [ -f $CSVNAME ] || { echo "   $CSVNAME not found, exit"; exit 1; }
 
 
@@ -92,5 +92,16 @@ for i in ${ALL_ADDR[*]}; do
 done
 
 
+# check if there are the same
+
+
+# save the existing iptables rule before run
+echo "the iptables rule will "
+
+
+# parse the iptables command
+
+
+# apply iptables rule
 
 
