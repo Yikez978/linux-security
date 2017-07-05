@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # usage:
 # 1. git clone https://github.com/dongcj/linux-security.git
-# 2. bash ./cyhd_Security.sh
+# 2. cd linux-security && bash ./cyhd_Security.sh
 
 
 ## change dir
@@ -12,7 +12,7 @@ cd ${CUR_DIR}
 [ `id -u` -ne 0 ] && echo "   Please use root to login!" && exit 1
 
 # install the necessary python package
-pip install csvkit || { echo "   pip install csvkit failed!'"; exit 1; }
+pip install csvkit &>/dev/null || { echo "   pip install csvkit failed!'"; exit 1; }
 
 ## check command
 which csvgrep &>/dev/null || { echo "   please use 'pip install csvkit first!'"; exit 1; }
@@ -22,7 +22,6 @@ RELEASE_FILE=/etc/redhat-release
 # get the dist name
 DIST=$(uname -r | sed -r  's/^.*\.([^\.]+)\.[^\.]+$/\1/')
 
-
 ## check release file
 [ -f "$RELEASE_FILE" ] || { echo "   Not RedHat/CentOS Linux? exit"; exit 1; }
 
@@ -30,6 +29,7 @@ OS_DISTRIBUTION=`sed -n '1p' $RELEASE_FILE | awk '{OFS=" ";print $1" "$2" "}' | 
 [ "$OS_DISTRIBUTION" != "Red Hat" -a "$OS_DISTRIBUTION" != "CentOS release" ] && { \
     echo "   Not RedHat/CentOS Linux? exit"; exit 1; }
 
+OS_FAMILY=`uname`
 [ "$OS_FAMILY" != "Linux" ] && echo "   Not RedHat/CentOS Linux? exit" && exit 1
 OS_VERSION=`cat $RELEASE_FILE | awk '{print $((NF-1))}'`
 [ ${OS_VERSION:0:1} -ge 6 ] 2>/dev/null || { echo "   RedHat/CentOS version must greater than 6, exit"; exit 1; }
