@@ -1,5 +1,7 @@
 # linux-security
-Auto iptables setting from a csv file
+Auto iptables setting from a csv file,
+
+
 
 # usage
 
@@ -7,4 +9,4 @@ Auto iptables setting from a csv file
 
     cd ./linux-security
 
-    bash ./cyhd_Security.sh
+    bash ./linux_security.sh
