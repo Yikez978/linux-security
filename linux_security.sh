@@ -11,12 +11,6 @@ cd ${CUR_DIR}
 ## Check the user
 [ `id -u` -ne 0 ] && echo "   Please use root to login!" && exit 1
 
-# install the necessary python package
-pip install csvkit &>/dev/null || { echo "   pip install csvkit failed!'"; exit 1; }
-
-## check command
-which csvgrep &>/dev/null || { echo "   please use 'pip install csvkit first!'"; exit 1; }
-
 ## centos release file
 RELEASE_FILE=/etc/redhat-release
 # get the dist name
@@ -33,6 +27,13 @@ OS_FAMILY=`uname`
 [ "$OS_FAMILY" != "Linux" ] && echo "   Not RedHat/CentOS Linux? exit" && exit 1
 OS_VERSION=`cat $RELEASE_FILE | awk '{print $((NF-1))}'`
 [ ${OS_VERSION:0:1} -ge 6 ] 2>/dev/null || { echo "   RedHat/CentOS version must greater than 6, exit"; exit 1; }
+
+# install the necessary python package
+if which pip &>/dev/null || yum install python-pip
+pip install csvkit &>/dev/null || { echo "   pip install csvkit failed!'"; exit 1; }
+
+## check command
+which csvgrep &>/dev/null || { echo "   please use 'pip install csvkit' manual"; exit 1; }
 
 
 ## console style
@@ -85,11 +86,11 @@ done
 
 
 ## check local ip in csv
-for i in ${ALL_ADDR[*]}; do
+#for i in ${ALL_ADDR[*]}; do
 
-    echo $i
+#    echo $i
 
-done
+#done
 
 
 # check if there are the same
