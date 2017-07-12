@@ -4,6 +4,9 @@
 # 2. cd linux-security && bash ./cyhd_Security.sh
 
 
+##
+export whitelist
+
 ## change dir
 CUR_DIR=$(echo `dirname $0` | sed -n 's/$/\//p')
 cd ${CUR_DIR}
@@ -56,10 +59,10 @@ CSVNAME=${0/.*//}.csv
 
 
 ## check csv format
-# Check the ',' numbers
+# 4 columns check
 DELIMETER=','
 CSV_COLUMNS=`awk -F"$DELIMETER" '{print NF}' $CSVNAME`
-echo $CSV_COLUMNS | grep -wq 4 || { echo "   $CSVNAME format check failed, exit"; exit 1; }
+[ -z `echo $CSV_COLUMNS | tr -d 4` ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
 
 
 ## get the local ipaddr
