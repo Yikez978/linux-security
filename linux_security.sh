@@ -57,6 +57,8 @@ TrapProcess(){
 CSVNAME=${0/.*//}.csv
 [ -f $CSVNAME ] || { echo "   $CSVNAME not found, exit"; exit 1; }
 
+echo CSVNAME is $CSVNAME
+
 
 ## check csv format
 # 4 columns check
