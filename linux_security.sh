@@ -18,7 +18,7 @@ cd ${CUR_DIR}
 if grep -iq ubuntu /etc/issue; then
     OS=ubuntu
     PKG_INSTALLER=apt-get
-    apt-get update
+    #apt-get update
 elif grep -iq "centos" /etc/issue; then
     OS=centos
     PKG_INSTALLER=yum
