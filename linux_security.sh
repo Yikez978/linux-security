@@ -26,7 +26,7 @@ elif grep -iq "centos" /etc/issue; then
 fi
 
 # install csvkit python tools
-if which pip &>/dev/null || $PKG_INSTALLER -y install python-pip
+which pip &>/dev/null || $PKG_INSTALLER -y install python-pip
 pip install csvkit &>/dev/null || { echo "   pip install csvkit failed!'"; exit 1; }
 
 ## check command
@@ -69,7 +69,7 @@ CSV_COLUMNS=`awk -F"$DELIMETER" '{print NF}' $CSVNAME`
 
 ## get the local ipaddr
 shopt -s extglob
-IFACES=(/proc/sys/net/ipv4/conf/!(all|default|lo|v*|docker*|br*))
+#IFACES=(/proc/sys/net/ipv4/conf/!(all|default|lo|v*|docker*|br*))
 shopt -u extglob
 
 DIST=$(uname -r | sed -r  's/^.*\.([^\.]+)\.[^\.]+$/\1/')
