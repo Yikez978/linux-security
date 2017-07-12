@@ -54,7 +54,7 @@ TrapProcess(){
 
 
 ## check csv file exist
-CSVNAME=${0/.*//}.csv
+CSVNAME=${0%.*}.csv
 [ -f $CSVNAME ] || { echo "   $CSVNAME not found, exit"; exit 1; }
 
 echo CSVNAME is $CSVNAME
@@ -69,7 +69,7 @@ CSV_COLUMNS=`awk -F"$DELIMETER" '{print NF}' $CSVNAME`
 
 ## get the local ipaddr
 shopt -s extglob
-#IFACES=(/proc/sys/net/ipv4/conf/!(all|default|lo|v*|docker*|br*))
+IFACES=(/proc/sys/net/ipv4/conf/!(all|default|lo|v*|docker*|br*))
 shopt -u extglob
 
 DIST=$(uname -r | sed -r  's/^.*\.([^\.]+)\.[^\.]+$/\1/')
