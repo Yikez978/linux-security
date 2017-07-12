@@ -79,7 +79,9 @@ for iface in "${IFACES[@]}"; do
 done
 
 ## print the csv content
-csvlook $CSVNAME
+echo
+csvlook -l $CSVNAME
+echo
 
 ## check local ip in csv
 for i in ${ALL_ADDR[*]}; do
