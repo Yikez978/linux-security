@@ -11,25 +11,19 @@ cd ${CUR_DIR}
 ## Check the user
 [ `id -u` -ne 0 ] && echo "   Please use root to login!" && exit 1
 
-## centos release file
-RELEASE_FILE=/etc/redhat-release
-# get the dist name
-DIST=$(uname -r | sed -r  's/^.*\.([^\.]+)\.[^\.]+$/\1/')
-
-## check release file
-[ -f "$RELEASE_FILE" ] || { echo "   Not RedHat/CentOS Linux? exit"; exit 1; }
-
-OS_DISTRIBUTION=`sed -n '1p' $RELEASE_FILE | awk '{OFS=" ";print $1" "$2" "}' | xargs`
-[ "$OS_DISTRIBUTION" != "Red Hat" -a "$OS_DISTRIBUTION" != "CentOS release" ] && { \
-    echo "   Not RedHat/CentOS Linux? exit"; exit 1; }
-
-OS_FAMILY=`uname`
-[ "$OS_FAMILY" != "Linux" ] && echo "   Not RedHat/CentOS Linux? exit" && exit 1
-OS_VERSION=`cat $RELEASE_FILE | awk '{print $((NF-1))}'`
-[ ${OS_VERSION:0:1} -ge 6 ] 2>/dev/null || { echo "   RedHat/CentOS version must greater than 6, exit"; exit 1; }
-
 # install the necessary python package
-if which pip &>/dev/null || yum install python-pip
+if grep -iq ubuntu /etc/issue; then
+    OS=ubuntu
+    PKG_INSTALLER=apt-get
+    apt-get update
+elif grep -iq "centos" /etc/issue; then
+    OS=centos
+    PKG_INSTALLER=yum
+
+fi
+
+# install csvkit python tools
+if which pip &>/dev/null || $PKG_INSTALLER -y install python-pip
 pip install csvkit &>/dev/null || { echo "   pip install csvkit failed!'"; exit 1; }
 
 ## check command
@@ -65,7 +59,7 @@ CSVNAME=${0/.*//}.csv
 # Check the ',' numbers
 DELIMETER=','
 CSV_COLUMNS=`awk -F"$DELIMETER" '{print NF}' $CSVNAME`
-echo $CSV_COLUMNS | grep -q 4 || { echo "   $CSVNAME format check failed, exit"; exit 1; }
+echo $CSV_COLUMNS | grep -wq 4 || { echo "   $CSVNAME format check failed, exit"; exit 1; }
 
 
 ## get the local ipaddr
@@ -86,14 +80,16 @@ done
 
 
 ## check local ip in csv
-#for i in ${ALL_ADDR[*]}; do
+for i in ${ALL_ADDR[*]}; do
 
-#    echo $i
+    echo $i
 
-#done
+    # check if there are the same rules
+
+done
 
 
-# check if there are the same
+
 
 
 # save the existing iptables rule before run
