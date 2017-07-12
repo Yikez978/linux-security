@@ -72,21 +72,20 @@ shopt -s extglob
 IFACES=(/proc/sys/net/ipv4/conf/!(all|default|lo|v*|docker*|br*))
 shopt -u extglob
 
-DIST=$(uname -r | sed -r  's/^.*\.([^\.]+)\.[^\.]+$/\1/')
-ADDR=''
 
 for iface in "${IFACES[@]}"; do
-    ADDR="$( \
-        /sbin/ip -4 -o addr show dev "${iface##*/}" \
-        | awk '{split($4,a,"."); print a[1] "." a[2] "." a[3] "." a[4]}' \
-    )"
-    ALL_ADDR=($ALL_ADDR $ADDR)
+    ADDR=$(ip -4 -o addr show dev ${iface##*/} | awk '{print $4}' | awk -F '/' '{print $1}')
+    ALL_ADDR=(${ALL_ADDR[*]} $ADDR)
 done
 
+## print the csv content
+csvlook $CSVNAME
 
 ## check local ip in csv
 for i in ${ALL_ADDR[*]}; do
 
+    # loop the csv SourceIP
+    SOURCEIP=csvgrep
     echo $i
 
     # check if there are the same rules
