@@ -67,7 +67,7 @@ CSVNAME=${0%.*}.csv
 # 4 columns check
 DELIMETER=','
 CSV_COLUMNS=`awk -F"$DELIMETER" '{print NF}' $CSVNAME`
-[ -z `echo $CSV_COLUMNS | tr -d 4` ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
+[ -z "$echo $CSV_COLUMNS | tr -d 4)" ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
 
 
 ## get the local ipaddr
