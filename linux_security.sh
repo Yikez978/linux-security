@@ -18,7 +18,7 @@ cd ${CUR_DIR}
 
 ## import library
 . ./lib/functions
-
+. ./lib/style
 
 ## install the necessary python package
 if grep -iq ubuntu /etc/issue; then
