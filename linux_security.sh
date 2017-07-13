@@ -6,6 +6,9 @@
 ## see 'linux-security.csv'
 CSV_COLUMNS=10
 
+## use style
+Draw_Line2 128
+
 ## change dir
 CUR_DIR=$(echo `dirname $0` | sed -n 's/$/\//p')
 cd ${CUR_DIR}
@@ -79,7 +82,7 @@ echo "$MY_RULE_CSV"
 echo
 
 ## zero rule for this host
-[ -z "$MY_RULE_CONTENT" ] && { echo "   no rules for this host, skipp"; exit 0; }
+[ -z "$MY_RULE_CONTENT" ] && { echo "No rules for this host, skip~"; exit 0; }
 
 ## LOCAL_NET
 ##
@@ -102,5 +105,6 @@ echo "the iptables rule will "
 
 
 # apply iptables rule
+
 
 
