@@ -32,7 +32,7 @@ fi
 
 ## check command
 if which csvgrep &>/dev/null; then
-    echo "   csvkit already installed, good ✓"
+    echo "csvkit already installed, good ✓"
 else
     # install csvkit python tools
     which pip &>/dev/null || $PKG_INSTALLER -y install python-pip
@@ -64,6 +64,7 @@ TrapProcess(){
 ## check csv file exist
 CSVNAME=${0%.*}.csv
 [ -f $CSVNAME ] || { echo "   $CSVNAME not found, exit"; exit 1; }
+rm -rf ${0%.*}_error.csv
 
 
 ## check csv format
@@ -80,7 +81,6 @@ shopt -s extglob
 IFACES=(/proc/sys/net/ipv4/conf/!(all|default|lo|v*|docker*|br*))
 shopt -u extglob
 
-
 for iface in "${IFACES[@]}"; do
     ADDR=$(ip -4 -o addr show dev ${iface##*/} | awk '{print $4}' | awk -F '/' '{print $1}')
     ALL_ADDR=(${ALL_ADDR[*]} $ADDR)
@@ -90,9 +90,11 @@ done
 echo "${BOLD}Dealing csv file..${NORMAL}";
 csvclean $CSVNAME &>/dev/null
 [ $? -eq 0 ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
+
 echo
 ip_regx="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))$"
 ALL_ADDR_CSV_PATTEN=`echo ${ALL_ADDR[*]} | tr ' ' '|'`
+
 
 ## get the local rule
 # SOURCEIP=`csvgrep -c2 -r "(${ALL_ADDR_CSV_PATTEN})" linux_security.csv | csvcut -c SIP | csvgrep -c 1 -r "$ip_regx" -K1`
