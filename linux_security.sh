@@ -67,11 +67,13 @@ CSVNAME=${0%.*}.csv
 
 
 ## check csv format
-# 4 columns check
-DELIMETER=','
-CSV_REAL_COLUMNS=`awk -F"$DELIMETER" '{print NF}' $CSVNAME`
-[ -z "$echo $CSV_REAL_COLUMNS | tr -d $CSV_COLUMNS)" ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
-
+if ! csvlook -l $CSVNAME 2>/dev/null; then
+    echo "   $CSVNAME error"
+    if [ -f ${0%.*}_error.csv ]; then
+        cat ${0%.*}_error.csv
+    fi
+    exit 5
+fi
 
 ## get the local ipaddr
 shopt -s extglob
@@ -87,7 +89,6 @@ done
 ## print the csv content
 echo "${BOLD}Dealing csv file..${NORMAL}";
 csvclean $CSVNAME &>/dev/null
-csvlook -l $CSVNAME
 [ $? -eq 0 ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
 echo
 ip_regx="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))$"
