@@ -26,12 +26,17 @@ elif grep -iq "centos" /etc/issue; then
 
 fi
 
-# install csvkit python tools
-which pip &>/dev/null || $PKG_INSTALLER -y install python-pip
-pip install csvkit &>/dev/null || { echo "   pip install csvkit failed!'"; exit 1; }
+
 
 ## check command
-which csvgrep &>/dev/null || { echo "   please use 'pip install csvkit' manual"; exit 1; }
+if which csvgrep &>/dev/null; then
+    echo "   csvkit already installed, skip"
+else
+    # install csvkit python tools
+    which pip &>/dev/null || $PKG_INSTALLER -y install python-pip
+    pip install csvkit &>/dev/null || { echo "   'pip install csvkit' failed! "; exit 1; }
+fi
+
 
 
 ## console style
@@ -84,14 +89,13 @@ csvlook -l $CSVNAME
 [ $? -eq 0 ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
 echo
 ip_regx="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))$"
-
 ALL_ADDR_CSV_PATTEN=`echo ${ALL_ADDR[*]} | tr ' ' '|'`
 
-echo ALL_ADDR_CSV_PATTEN are $ALL_ADDR_CSV_PATTEN
-
-    # loop the csv SourceIP
-SOURCEIP=`csvgrep -c2 linux_security.csv | csvcut -c SourceIP | csvgrep -c 1 -r "$ip_regx" -K1`
-
+## get the local rule
+# SOURCEIP=`csvgrep -c2 linux_security.csv -r "(${ALL_ADDR_CSV_PATTEN})" | csvcut -c SourceIP | csvgrep -c 1 -r "$ip_regx" -K1`
+echo "${BOLD}Getting rule for this host..${NORMAL}"
+LOCAL_RULE=`csvgrep -c2 linux_security.csv -r "(${ALL_ADDR_CSV_PATTEN})"`
+echo "$LOCAL_RULE"
 
     # check if there are the same rules
 
