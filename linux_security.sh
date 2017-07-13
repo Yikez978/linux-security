@@ -3,6 +3,7 @@
 # 1. git clone https://github.com/dongcj/linux-security.git
 # 2. cd linux-security && bash ./cyhd_Security.sh
 
+set -e
 
 ##
 export whitelist
@@ -86,14 +87,11 @@ ip_regx="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([0-9]|[1-9][0
 
 ALL_ADDR_CSV_PATTEN=`echo $ALL_ADDR | tr ' ' '|'`
 
+echo ALL_ADDR_CSV_PATTEN are $ALL_ADDR_CSV_PATTEN
+
     # loop the csv SourceIP
-    SOURCEIP=csvgrep -c2 linux_security.csv | csvcut -c SourceIP | csvgrep -c 1 -r "$ip_regx" -K1
+SOURCEIP=`csvgrep -c2 linux_security.csv | csvcut -c SourceIP | csvgrep -c 1 -r "$ip_regx" -K1`
 
-    for sip in $SOURCEIP; do
-
-
-
-    done
 
     # check if there are the same rules
 
