@@ -5,6 +5,9 @@
 
 set -e
 
+## please see linux-security.csv
+CSV_COLUMNS=10
+
 
 
 ## change dir
@@ -66,8 +69,8 @@ CSVNAME=${0%.*}.csv
 ## check csv format
 # 4 columns check
 DELIMETER=','
-CSV_COLUMNS=`awk -F"$DELIMETER" '{print NF}' $CSVNAME`
-[ -z "$echo $CSV_COLUMNS | tr -d 4)" ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
+CSV_REAL_COLUMNS=`awk -F"$DELIMETER" '{print NF}' $CSVNAME`
+[ -z "$echo $CSV_REAL_COLUMNS | tr -d $CSV_COLUMNS)" ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
 
 
 ## get the local ipaddr
