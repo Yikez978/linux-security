@@ -5,7 +5,36 @@
 #
 
 # import style
-. ../lib/style
+. ./lib/style
+
+
+######################################################################
+# 作用: 捕捉用户的中断,即用ctrl+C中断时提示用户,防止误退出
+# 用法: 无须使用
+# 注意: 无须在各个脚本中调用了
+######################################################################
+trap TrapProcess 2 3
+
+# rm the tmp file if exit
+# trap "rm -rf /tmp/*" 0
+
+TrapProcess() {
+    clear
+    echo
+    echo
+    echo -e "\033[?25h"
+    /bin/stty -igncr
+    /bin/stty echo
+    tput cup `expr $(tput lines) / 2 - 1` `expr $(tput cols) / 2 - 50`
+    echo -n "      Do you really want to quit? \"n\" or \"c\"  to continue, \"y\" or \"q\" to quit : "
+    read -n1 ANS
+    if [ "${ANS}" = "Y" -o "${ANS}" = "y" -o "${ANS}" = "Q" -o "${ANS}" = "q" ];then
+        clear
+        Log ERROR "Exit by user!"
+    else
+        return 0
+    fi
+}
 
 
 ######################################################################
