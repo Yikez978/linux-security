@@ -78,14 +78,14 @@ for iface in "${IFACES[@]}"; do
 done
 
 ## print the csv content
-echo "${BOLD}  Dealing csv file..${NORMAL}"
+echo "${BOLD}Dealing csv file..${NORMAL}"
 csvclean $CSVNAME &>/dev/null
 csvlook -l $CSVNAME
 [ $? -eq 0 ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
 echo
 ip_regx="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))$"
 
-ALL_ADDR_CSV_PATTEN=`echo $ALL_ADDR | tr ' ' '|'`
+ALL_ADDR_CSV_PATTEN=`echo ${ALL_ADDR[*]} | tr ' ' '|'`
 
 echo ALL_ADDR_CSV_PATTEN are $ALL_ADDR_CSV_PATTEN
 
