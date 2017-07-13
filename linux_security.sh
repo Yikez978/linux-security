@@ -57,8 +57,6 @@ TrapProcess(){
 CSVNAME=${0%.*}.csv
 [ -f $CSVNAME ] || { echo "   $CSVNAME not found, exit"; exit 1; }
 
-echo CSVNAME is $CSVNAME
-
 
 ## check csv format
 # 4 columns check
@@ -79,20 +77,26 @@ for iface in "${IFACES[@]}"; do
 done
 
 ## print the csv content
-echo
+echo "${BOLD}  Dealing csv file..${NORMAL}"
+csvclean $CSVNAME &>/dev/null
 csvlook -l $CSVNAME
+[ $? -eq 0 ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
 echo
+ip_regx="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))$"
 
-## check local ip in csv
-for i in ${ALL_ADDR[*]}; do
+ALL_ADDR_CSV_PATTEN=`echo $ALL_ADDR | tr ' ' '|'`
 
     # loop the csv SourceIP
-    SOURCEIP=csvgrep
-    echo $i
+    SOURCEIP=csvgrep -c2 linux_security.csv | csvcut -c SourceIP | csvgrep -c 1 -r "$ip_regx" -K1
+
+    for sip in $SOURCEIP; do
+
+
+
+    done
 
     # check if there are the same rules
 
-done
 
 
 
