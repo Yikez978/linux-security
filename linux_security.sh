@@ -7,7 +7,7 @@
 CSV_COLUMNS=10
 
 ## use style
-Draw_Line2 128
+DrawLine 128
 
 ## change dir
 CUR_DIR=$(echo `dirname $0` | sed -n 's/$/\//p')
@@ -82,7 +82,7 @@ echo "$MY_RULE_CSV"
 echo
 
 ## zero rule for this host
-[ -z "$MY_RULE_CONTENT" ] && { echo "No rules for this host, skip~"; exit 0; }
+[ -z "$MY_RULE_CONTENT" ] && { echo "No rules for this host, skip~"; echo; exit 0; }
 
 ## LOCAL_NET
 ##
