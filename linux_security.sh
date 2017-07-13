@@ -29,7 +29,7 @@ fi
 
 ## check command
 if which csvgrep &>/dev/null; then
-    echo "   csvkit already installed, skip"
+    echo "   csvkit already installed, good✔"
 else
     # install csvkit python tools
     which pip &>/dev/null || $PKG_INSTALLER -y install python-pip
