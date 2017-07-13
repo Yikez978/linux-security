@@ -9,6 +9,61 @@
 
 
 ######################################################################
+# 作用: 画一条屏幕宽度百分比的直线(默认80%)
+# 用法: Draw_Line <PERCENTAGE>
+# 注意：
+######################################################################
+Draw_Line() {
+    if [ -z "$1" ]; then
+        percent=80
+    else
+        percent=`echo ${1%%%}`
+
+        # if num
+        if [ -z "`echo "$percent" | tr -d \[0-9\]`" ]; then
+
+            # 10#
+            percent=$((10#$percent))
+
+            # if bigger than 100
+            if [ $percent -gt 100 ]; then
+                percent=100
+            elif [ $percent -lt 0 ]; then
+                percent=0
+            fi
+        else
+
+            Log ERROR "Function Draw_Line() error! Usage: Draw_Line [PERCENTAGE]\n"
+
+        fi
+    fi
+
+
+    echo
+    SHELL_WINDOW_WIDTH=`tput cols`
+    LINE_WIDTH=`expr $SHELL_WINDOW_WIDTH \* $percent / 100`
+    for ((i=1;i<=${LINE_WIDTH};i++));do
+        echo -n "-"
+    done
+    echo
+}
+
+
+######################################################################
+# 作用: 画一条指定宽度的直线
+# 用法: Draw_Line <WIDTH>
+# 注意：
+######################################################################
+Draw_Line2() {
+
+    echo
+    for ((i=1;i<=${1};i++));do
+        echo -n "-"
+    done
+    echo
+}
+
+######################################################################
 # 作用: 捕捉用户的中断,即用ctrl+C中断时提示用户,防止误退出
 # 用法: 无须使用
 # 注意: 无须在各个脚本中调用了
