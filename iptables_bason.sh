@@ -35,50 +35,50 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 # IP 定义
 ###########################################################
 
-# 内部网络
+# 内部网络，在外网中不需要设置
 # LOCAL_NET="xxx.xxx.xxx.xxx/xx"
 
-# 内部网络限制范围
+# 内部限制的网络范围
 # LIMITED_LOCAL_NET="xxx.xxx.xxx.xxx/xx"
 
-# Zabbix IP
+# Zabbix IP，这里填 server 的 IP 地址或主机名
 # ZABBIX_IP="xxx.xxx.xxx.xxx"
 
 # 所有的 IP
 # ANY="0.0.0.0/0"
 
-# 允许主机
+# 允许主机，这里可以设置为自己的局域网所在的外网 IP
 # ALLOW_HOSTS=(
-# 	"xxx.xxx.xxx.xxx"
-# 	"xxx.xxx.xxx.xxx"
-# 	"xxx.xxx.xxx.xxx"
+#   "xxx.xxx.xxx.xxx"
+#   "xxx.xxx.xxx.xxx"
+#   "xxx.xxx.xxx.xxx"
 # )
 
-# 无条件丢弃的主机
+# 禁止主机
 # DENY_HOSTS=(
-# 	"xxx.xxx.xxx.xxx"
-# 	"xxx.xxx.xxx.xxx"
-# 	"xxx.xxx.xxx.xxx"
+#   "xxx.xxx.xxx.xxx"
+#   "xxx.xxx.xxx.xxx"
+#   "xxx.xxx.xxx.xxx"
 # )
 
 ###########################################################
 # 端口定义
 ###########################################################
-
-SSH=${SSH_PORT:-22}
-FTP=20,21
-DNS=53
-SMTP=25,465,587
-POP3=110,995
-IMAP=143,993
-HTTP=${HTTP_PORT:-80}
-HTTPS=${HTTPS_PORT:-443}
-IDENT=113
-NTP=123
-MYSQL=3306
-POSTGRESQL=${POSTGRESQL_PORT:-5432}
-NET_BIOS=135,137,138,139,445
-DHCP=67,68
+OTHER_SERVICE_PORT=${OTHER_SERVICE_PORT}
+#SSH=22
+#HTTP=80
+#HTTPS=443
+#POSTGRESQL=5432
+#FTP=20,21
+#DNS=53
+#SMTP=25,465,587
+#POP3=110,995
+#IMAP=143,993
+#IDENT=113
+#NTP=123
+#MYSQL=3306
+#NET_BIOS=135,137,138,139,445
+#DHCP=67,68
 
 ###########################################################
 # 函数
@@ -87,28 +87,28 @@ DHCP=67,68
 # iptables 初始化，删除所有规则
 initialize()
 {
-	iptables -F # 初始化
-	iptables -X # 删除链
-	iptables -Z # 清除包、字节计数器
-	iptables -P INPUT   ACCEPT
-	iptables -P OUTPUT  ACCEPT
-	iptables -P FORWARD ACCEPT
+    iptables -F # 初始化
+    iptables -X # 删除链
+    iptables -Z # 清除包、字节计数器
+    iptables -P INPUT   ACCEPT
+    iptables -P OUTPUT  ACCEPT
+    iptables -P FORWARD ACCEPT
 }
 
 # 处理完成后的动作
 finailize()
 {
-	/etc/init.d/iptables save && # 保存設置
-	/etc/init.d/iptables restart && # 重启
+    /etc/init.d/iptables save && # 保存設置
+    /etc/init.d/iptables restart && # 重启
         return 0
-	return 1
+    return 1
 }
 
 # 开发模式
 if [ "$1" == "dev" ]
 then
-	iptables() { echo "iptables $@"; }
-	finailize() { echo "finailize"; }
+    iptables() { echo "iptables $@"; }
+    finailize() { echo "finailize"; }
 fi
 
 ###########################################################
@@ -132,20 +132,20 @@ iptables -P FORWARD DROP
 iptables -A INPUT -i lo -j ACCEPT # SELF -> SELF
 
 # 本地网络
-# 如果设置 $ LOCAL_NET 允许与局域网中的其他服务器相互通信
+# 允许来自 $LOCAL_NET 接入
 if [ "$LOCAL_NET" ]
 then
-	iptables -A INPUT -p tcp -s $LOCAL_NET -j ACCEPT # LOCAL_NET -> SELF
+    iptables -A INPUT -p tcp -s $LOCAL_NET -j ACCEPT # LOCAL_NET -> SELF
 fi
 
 # 允许主机
 # 允许 $ALLOW_HOSTS 中主机通信
 if [ "${ALLOW_HOSTS}" ]
 then
-	for allow_host in ${ALLOW_HOSTS[@]}
-	do
-		iptables -A INPUT -p tcp -s $allow_host -j ACCEPT # allow_host -> SELF
-	done
+    for allow_host in ${ALLOW_HOSTS[@]}
+    do
+        iptables -A INPUT -p tcp -s $allow_host -j ACCEPT # allow_host -> SELF
+    done
 fi
 
 ###########################################################
@@ -153,11 +153,11 @@ fi
 ###########################################################
 if [ "${DENY_HOSTS}" ]
 then
-	for deny_host in ${DENY_HOSTS[@]}
-	do
-		iptables -A INPUT -s $deny_host -m limit --limit 1/s -j LOG --log-prefix "deny_host: "
-		iptables -A INPUT -s $deny_host -j DROP
-	done
+    for deny_host in ${DENY_HOSTS[@]}
+    do
+        iptables -A INPUT -s $deny_host -m limit --limit 1/s -j LOG --log-prefix "deny_host: "
+        iptables -A INPUT -s $deny_host -j DROP
+    done
 fi
 
 ###########################################################
@@ -166,7 +166,7 @@ fi
 iptables -A INPUT  -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 ###########################################################
-# 攻击应对: 隐形扫描
+# 攻击应对: 扫描
 ###########################################################
 iptables -N STEALTH_SCAN # 新建 "STEALTH_SCAN" 链
 iptables -A STEALTH_SCAN -j LOG --log-prefix "stealth_scan_attack: "
@@ -215,7 +215,7 @@ iptables -A INPUT -p icmp --icmp-type echo-request -j PING_OF_DEATH
 
 ###########################################################
 # 攻击应对: SYN Flood Attack
-# 这个策略之外再加上 Syn Cookie 有效。
+# 这个策略之外再加上 SYN_COOKIE 有效。
 ###########################################################
 iptables -N SYN_FLOOD # 新建 "SYN_FLOOD" 链
 iptables -A SYN_FLOOD -p tcp --syn \
@@ -274,10 +274,7 @@ iptables -A INPUT -p tcp -m multiport --dports $HTTP -j HTTP_DOS
 
 ###########################################################
 # 攻击应对: IDENT port probe
-# ident利用攻击者为将来的攻击准备
-# 为了确认系统是否容易受攻击，所以实话端口检查
-# 可能会有一些可能性
-# DROP 会使某些服务反应下降，例如『邮件服务』
+# 可能会会使某些服务反应下降，例如『邮件服务』
 ###########################################################
 iptables -A INPUT -p tcp -m multiport --dports $IDENT -j REJECT --reject-with tcp-reset
 
@@ -321,10 +318,10 @@ iptables -A INPUT -d 224.0.0.1       -j DROP
 iptables -A INPUT -p icmp -j ACCEPT # ANY -> SELF
 
 # HTTP, HTTPS
-iptables -A INPUT -p tcp -m multiport --dports $HTTP -j ACCEPT # ANY -> SELF
+iptables -A INPUT -p tcp -m multiport --dports $SERVICE_PORT -j ACCEPT # ANY -> SELF
 
 # SSH: 如果要限制 TRUST_HOSTS 进入，注释掉以下：
-iptables -A INPUT -p tcp -m multiport --dports $SSH -j ACCEPT # ANY -> SEL
+#iptables -A INPUT -p tcp -m multiport --dports $SSH -j ACCEPT # ANY -> SEL
 
 # FTP
 # iptables -A INPUT -p tcp -m multiport --dports $FTP -j ACCEPT # ANY -> SELF
@@ -348,25 +345,25 @@ iptables -A INPUT -p tcp -m multiport --dports $SSH -j ACCEPT # ANY -> SEL
 
 if [ "$LIMITED_LOCAL_NET" ]
 then
-	# SSH
-	iptables -A INPUT -p tcp -s $LIMITED_LOCAL_NET -m multiport --dports $SSH -j ACCEPT # LIMITED_LOCAL_NET -> SELF
+    # SSH
+    iptables -A INPUT -p tcp -s $LIMITED_LOCAL_NET -m multiport --dports $SSH -j ACCEPT # LIMITED_LOCAL_NET -> SELF
 
-	# FTP
-	iptables -A INPUT -p tcp -s $LIMITED_LOCAL_NET -m multiport --dports $FTP -j ACCEPT # LIMITED_LOCAL_NET -> SELF
+    # FTP
+    iptables -A INPUT -p tcp -s $LIMITED_LOCAL_NET -m multiport --dports $FTP -j ACCEPT # LIMITED_LOCAL_NET -> SELF
 
-	# MySQL
-	iptables -A INPUT -p tcp -s $LIMITED_LOCAL_NET -m multiport --dports $MYSQL -j ACCEPT # LIMITED_LOCAL_NET -> SELF
+    # MySQL
+    iptables -A INPUT -p tcp -s $LIMITED_LOCAL_NET -m multiport --dports $MYSQL -j ACCEPT # LIMITED_LOCAL_NET -> SELF
 fi
 
 ###########################################################
 # 针对特定主机的 INPUT
 ###########################################################
 
-if [ "$ZABBIX_IP" ]
-then
-	# Zabbix 相关许可
-	iptables -A INPUT -p tcp -s $ZABBIX_IP --dport 10050 -j ACCEPT # Zabbix -> SELF
-fi
+#if [ "$ZABBIX_IP" ]
+#then
+#    # Zabbix 相关许可
+#    iptables -A INPUT -p tcp -s $ZABBIX_IP --dport 10050 -j ACCEPT # Zabbix -> SELF
+#fi
 
 ###########################################################
 # 否则
@@ -379,7 +376,7 @@ iptables -A INPUT  -j DROP
 # SSH 被锁定的解决办法
 # 30秒后自动 rollback，请测试 SSH 后按 Ctrl-C 会完成设置
 ###########################################################
-trap 'finailize && exit 0' 2 # Ctrl-C をトラップする
+trap 'finailize && exit 0' 2 # Ctrl-C
 echo "In 30 seconds iptables will be automatically reset."
 echo "Don't forget to test new SSH connection!"
 echo "If there is no problem then press Ctrl-C to finish."

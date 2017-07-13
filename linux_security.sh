@@ -5,8 +5,7 @@
 
 set -e
 
-##
-export whitelist
+
 
 ## change dir
 CUR_DIR=$(echo `dirname $0` | sed -n 's/$/\//p')
@@ -83,7 +82,7 @@ for iface in "${IFACES[@]}"; do
 done
 
 ## print the csv content
-echo "${BOLD}Dealing csv file..${NORMAL}"
+echo "${BOLD}Dealing csv file..${NORMAL}";
 csvclean $CSVNAME &>/dev/null
 csvlook -l $CSVNAME
 [ $? -eq 0 ] || { echo "   $CSVNAME format check failed, exit"; exit 1; }
@@ -92,13 +91,20 @@ ip_regx="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([0-9]|[1-9][0
 ALL_ADDR_CSV_PATTEN=`echo ${ALL_ADDR[*]} | tr ' ' '|'`
 
 ## get the local rule
-# SOURCEIP=`csvgrep -c2 linux_security.csv -r "(${ALL_ADDR_CSV_PATTEN})" | csvcut -c SourceIP | csvgrep -c 1 -r "$ip_regx" -K1`
+# SOURCEIP=`csvgrep -c2 -r "(${ALL_ADDR_CSV_PATTEN})" linux_security.csv | csvcut -c SourceIP | csvgrep -c 1 -r "$ip_regx" -K1`
 echo "${BOLD}Getting rule for this host..${NORMAL}"
 LOCAL_RULE=`csvgrep -c2 linux_security.csv -r "(${ALL_ADDR_CSV_PATTEN})"`
-echo "$LOCAL_RULE"
+LOCAL_RULE_CSV=`echo "$LOCAL_RULE" | csvlook`
+LOCAL_RULE_CONTENT=`echo "$LOCAL_RULE" | csvgrep -c 1 -r "$ip_regx" -K1`
+echo "$LOCAL_RULE_CSV"
+echo
 
-    # check if there are the same rules
 
+## the service port
+##
+
+
+export whitelist
 
 
 
