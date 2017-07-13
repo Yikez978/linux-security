@@ -81,6 +81,7 @@ MY_RULE_CONTENT=`echo "$MY_RULE" | csvgrep -c 1 -r "$ip_regx" -K1`
 echo "$MY_RULE_CSV"
 echo
 
+echo ALL_ADDR_CSV_PATTEN is $ALL_ADDR_CSV_PATTEN
 ## zero rule for this host
 [ -z "$MY_RULE_CONTENT" ] && { echo "No rules for this host, skip~"; echo; exit 0; }
 
