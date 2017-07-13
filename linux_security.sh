@@ -29,7 +29,7 @@ fi
 
 ## check command
 if which csvgrep &>/dev/null; then
-    echo "   csvkit already installed, good✔"
+    echo "   csvkit already installed, good ✓"
 else
     # install csvkit python tools
     which pip &>/dev/null || $PKG_INSTALLER -y install python-pip
@@ -91,7 +91,7 @@ ip_regx="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([0-9]|[1-9][0
 ALL_ADDR_CSV_PATTEN=`echo ${ALL_ADDR[*]} | tr ' ' '|'`
 
 ## get the local rule
-# SOURCEIP=`csvgrep -c2 -r "(${ALL_ADDR_CSV_PATTEN})" linux_security.csv | csvcut -c SourceIP | csvgrep -c 1 -r "$ip_regx" -K1`
+# SOURCEIP=`csvgrep -c2 -r "(${ALL_ADDR_CSV_PATTEN})" linux_security.csv | csvcut -c SIP | csvgrep -c 1 -r "$ip_regx" -K1`
 echo "${BOLD}Getting rule for this host..${NORMAL}"
 LOCAL_RULE=`csvgrep -c2 linux_security.csv -r "(${ALL_ADDR_CSV_PATTEN})"`
 LOCAL_RULE_CSV=`echo "$LOCAL_RULE" | csvlook`
@@ -100,8 +100,11 @@ echo "$LOCAL_RULE_CSV"
 echo
 
 
-## the service port
+## LOCAL_NET
 ##
+
+
+## LIMITED_LOCAL_NET
 
 
 export whitelist
