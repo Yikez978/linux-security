@@ -6,8 +6,6 @@
 ## see 'linux-security.csv'
 CSV_COLUMNS=10
 
-## use style
-DrawLine 128
 
 ## change dir
 CUR_DIR=$(echo `dirname $0` | sed -n 's/$/\//p')
@@ -18,7 +16,9 @@ cd ${CUR_DIR}
 
 ## import library
 . ./lib/functions
-. ./lib/style
+
+## use style
+DrawLine 128
 
 ## install the necessary python package
 if grep -iq ubuntu /etc/issue; then
