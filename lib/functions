@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+#
+# Author: dongcj <ntwk@163.com>
+# description: 全局使用的function放在这里
+#
+
+
+
+
+
+######################################################################
+# 作用: 对纯数字, 纯字母, IP等的检测, 如果类型符合则返回0,否则返回非0
+# 用法: Checker <TYPE> <OBJECT>
+# TYPE: is_ip / is_ip_range / is_hostname / is_encoding /is_allnum / is_domain / is_password
+# 注意: 只返回, 不退出
+######################################################################
+Checker() {
+    if [ "$#" -ne 2 ]; then
+        Log ERROR "Function Checker() error! Usage: Checker <TYPE> <OBJECT>\n"
+    fi
+
+    type=$1
+    object=$2
+
+    case $type in
+
+        is_ip)
+            if ipcalc -c "$object" >/dev/null 2>&1;then
+                return 0
+            else
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            fi
+
+        ;;
+        is_ip_range)
+            # can be separate with "," or '|' or '-'
+            if [ `echo "$object" | tr ',|-' ' ' | xargs -n 1 | wc -l` -gt 1 ]; then
+                for i in `echo "$object" | tr ',|-' ' '`; do
+                    if ! ipcalc -c $i >/dev/null 2>&1; then
+                        Log WARN "object \"$object\" is not \"$type\" type"
+                        return 1
+                    fi
+                done
+            else
+                return 1
+            fi
+        ;;
+
+        is_hostname)
+            if [ -n "`echo $object | tr -d '\[a-zA-Z0-9-\]'`" ]; then
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            else
+                return 0
+            fi
+        ;;
+
+        is_encoding)
+            [ -f "$object" ] && dos2unix "$object"
+            if file "$object" | grep -qE "UTF-8|ASCII"; then
+                return 0
+            else
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            fi
+        ;;
+
+        is_allnum)
+            if [ -z "`echo "$object" | tr -d \[0-9\]`" ]; then
+                return 0
+            else
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            fi
+
+            # Another method
+            # echo $2 | grep -q '^[-]\?[0-9]\+$' && return 0
+        ;;
+
+        is_domain)
+            if [ `echo "$object" | xargs -n 1 | wc -l` -ne 1 ]; then
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            fi
+
+            #only can contain ".[0-9a-zA-Z-]"
+            if [ -n "`echo "$object" | tr -d '.\[0-9a-zA-Z-\]'`" ]; then
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            fi
+
+            #the domain shout contain at least "xx.xx"
+            if ! echo $object | grep "[0-9a-zA-Z-]\{1,\}\.[0-9a-zA-Z]\{1,\}" >/dev/null 2>&1;then
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            fi
+        ;;
+
+        is_username)
+            # user name [a-zA-Z0-9-\]
+            if [ -n "`echo $object | tr -d '\[a-zA-Z0-9-\]'`" ]; then
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            else
+                return 0
+            fi
+        ;;
+
+        is_password)
+            # the password can only contain "[a-z][A-Z][0-9]~!@#$%^&*()_+-="
+            if [ -n "`echo $object | tr -d '\[a-z\]\[A-Z\]\[0-9\]~\!@#$%^&*()_+-='`" ]; then
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            else
+                return 0
+            fi
+        ;;
+
+        is_shortdomain)
+            # user define short domain, length <4, start with [a-zA-Z1-9-]
+
+            # only contain [a-zA-Z0-9-]
+            if [ -n "`echo $object | tr -d '\[a-zA-Z0-9-\]'`" ]; then
+                Log WARN "object \"$object\" is not \"$type\" type"
+                return 1
+            fi
+
+            # length < 4(yes, it is 4, not 5)
+            if [ "`echo $object | wc -c`" -gt 5 ]; then
+                Log WARN "type \"$type\" can only < 4 characters"
+                return 1
+            fi
+
+            # first must be letter
+            if ! echo $object | grep -q "^[a-zA-Z]" ; then
+                Log WARN "type \"$type\" must be start with [a-zA-Z]"
+                return 1
+            fi
+
+            return 0
+        ;;
+        *)
+            Log WARN "type \"$type\" does not exist"
+            return 99
+    esac
+
+}
+
+

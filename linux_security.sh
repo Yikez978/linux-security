@@ -17,7 +17,7 @@ cd ${CUR_DIR}
 [ `id -u` -ne 0 ] && echo "   Please use root to login!" && exit 1
 
 ## import library
-. ../functions
+. ./lib/functions
 
 Draw_Line 80%
 
