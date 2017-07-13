@@ -74,7 +74,7 @@ csvclean $CSVNAME &>/dev/null
 ## find the local rule
 echo
 echo "${BOLD}# Getting rule for this host..${NORMAL}"
-ALL_ADDR_CSV_PATTEN=$(echo ${ALL_ADDR[*]} | xargs -n1 | sed -e 's/^/\^/' -e 's/$/\$/' | tr '\n' '|')
+ALL_ADDR_CSV_PATTEN=$(echo ${ALL_ADDR[*]} | xargs -n1 | sed -e 's/^/\^/' -e 's/$/\$/' | xargs | tr ' ' '|')
 MY_RULE=`csvgrep -c2 $CSVNAME -r "(${ALL_ADDR_CSV_PATTEN})"`
 MY_RULE_CSV=`echo "$MY_RULE" | csvlook`
 MY_RULE_CONTENT=`echo "$MY_RULE" | csvgrep -c 1 -r "$ip_regx" -K1`
