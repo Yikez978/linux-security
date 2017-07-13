@@ -83,9 +83,9 @@ echo
 
 
 ## zero rule for this host
-[ -z "$MY_RULE_CONTENT" ] && { echo "No rules for this host, skip~"; echo; exit 0; }
+[ -z "$MY_RULE_CONTENT" ] && { echo "No rules for this host, skip ☀"; echo; exit 0; }
 
-## LOCAL_NET
+## GET LOCAL_NET
 ##
 
 
