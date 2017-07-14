@@ -77,7 +77,12 @@ echo "${BOLD}# Getting rule for this host..${NORMAL}"
 ALL_ADDR_CSV_PATTEN=$(echo ${ALL_ADDR[*]} | xargs -n1 | sed -e 's/^/\^/' -e 's/$/\$/' | xargs | tr ' ' '|')
 MY_RULE=`csvgrep -c2 $CSVNAME -r "(${ALL_ADDR_CSV_PATTEN})"`
 MY_RULE_CSV=`echo "$MY_RULE" | csvlook`
-MY_RULE_CONTENT_LOCAL_NET=`echo $MY_RULE_CSV | csvgrep -c 2 -r "$ip_regx"`
+# 9th column is local_net
+MY_RULE_CONTENT_LOCAL_NET=`echo "$MY_RULE" | csvgrep -c 2 -r "$ip_regx" -K1| csvcut -c 9`
+MY_RULE_CONTENT_IMITED_LOCAL_NET=`echo "$MY_RULE" | csvgrep -c 2 -r "$ip_regx" -K1| csvcut -c 10`
+MY_RULE_CONTENT_ALLOW_HOSTS=`echo "$MY_RULE" | csvgrep -c 2 -r "$ip_regx" -K1| csvcut -c 10`
+MY_RULE_CONTENT_DENY_HOSTS=`echo "$MY_RULE" | csvgrep -c 2 -r "$ip_regx" -K1| csvcut -c 10`
+
 echo "$MY_RULE_CSV"
 echo
 
